@@ -32,7 +32,7 @@ jobs:
 
     - name: Deploy to multiple Lambda functions
       run: |
-        for function_name in getJiraWebhook
+        for function_name in receiveJiraWebhook
         do
           aws lambda update-function-code --function-name $function_name --zip-file fileb://bootstrap.zip
         done
