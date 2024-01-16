@@ -3,7 +3,7 @@ name: Deploy Lambda Function
 on:
   push:
     branches:
-      - main
+      - master
 
 jobs:
   build-and-deploy:
@@ -20,7 +20,8 @@ jobs:
 
     - name: Build Lambda function
       run: |
-        GOOS=linux GOARCH=amd64 go build -o bootstrap main.go  # main.goはLambda関数のエントリポイント
+        cd receive_jira_webhook
+        GOOS=linux GOARCH=amd64 go build -o bootstrap main.go
         zip function.zip bootstrap
     
     - name: Deploy to AWS Lambda
@@ -34,5 +35,5 @@ jobs:
       run: |
         for function_name in receiveJiraWebhook
         do
-          aws lambda update-function-code --function-name $function_name --zip-file fileb://bootstrap.zip
+          aws lambda update-function-code --function-name $function_name --zip-file fileb://receive_jira_webhook/function.zip
         done
