@@ -21,8 +21,8 @@ jobs:
     - name: Build Lambda function
       run: |
         cd receive_jira_webhook
-        GOOS=linux GOARCH=amd64 go build -o bootstrap main.go
-        zip function.zip bootstrap
+        GOOS=linux GOARCH=amd64 go build -o main main.go
+        zip function.zip main
     
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v1
