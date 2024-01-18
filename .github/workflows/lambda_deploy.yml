@@ -31,9 +31,5 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ secrets.AWS_REGION }}
 
-    - name: Deploy to multiple Lambda functions
-      run: |
-        for function_name in receiveJiraWebhook
-        do
-          aws lambda update-function-code --function-name $function_name --zip-file fileb://receive_jira_webhook/function.zip
-        done
+    - name: Deploy to Lambda functions
+      run: aws lambda update-function-code --function-name receiveJiraWebhook --zip-file fileb://receive_jira_webhook/function.zip
