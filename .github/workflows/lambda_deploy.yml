@@ -15,8 +15,8 @@ jobs:
 
     - name: Build Lambda function using Docker
       run: |
-        cd receive_jira_webhook
-        docker run --rm -v "$PWD":/usr/src/receive_jira_webhook -w /usr/src/receive_jira_webhook golang:1.20 \
+        cd polite_inquiry_converter
+        docker run --rm -v "$PWD":/usr/src/polite_inquiry_converter -w /usr/src/polite_inquiry_converter/receive_jira_webhook golang:1.20 \
           go build -o main
         zip function.zip main
 
@@ -28,4 +28,4 @@ jobs:
         aws-region: ${{ secrets.AWS_REGION }}
 
     - name: Deploy to Lambda functions
-      run: aws lambda update-function-code --function-name receiveJiraWebhook --zip-file fileb://receive_jira_webhook/function.zip
+      run: aws lambda update-function-code --function-name receiveJiraWebhook --zip-file fileb://polite_inquiry_converter/receive_jira_webhook/function.zip
