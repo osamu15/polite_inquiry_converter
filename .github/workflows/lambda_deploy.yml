@@ -16,6 +16,8 @@ jobs:
     - name: Build Lambda function using Docker
       run: |
         docker run --rm -v "$PWD":/usr/src/polite_inquiry_converter -w /usr/src/polite_inquiry_converter golang:1.20 sh -c '
+          apt-get update &&
+          apt-get install -y zip &&
           cd receive_jira_webhook &&
           go build -buildvcs=false -o main &&
           zip /usr/src/polite_inquiry_converter/receive_jira_webhook/function.zip main
