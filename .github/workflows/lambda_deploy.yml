@@ -13,17 +13,13 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Set up Go
-      uses: actions/setup-go@v2
-      with:
-        go-version: '1.20'
-
-    - name: Build Lambda function
+    - name: Build Lambda function using Docker
       run: |
         cd receive_jira_webhook
-        GOOS=linux GOARCH=amd64 go build -o main main.go
+        docker run --rm -v "$PWD":/usr/src/receive_jira_webhook -w /usr/src/receive_jira_webhook golang:1.20 \
+          go build -o main
         zip function.zip main
-    
+
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
