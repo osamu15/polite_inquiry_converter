@@ -19,7 +19,7 @@ jobs:
           yum update -y &&
           yum install -y golang zip &&
           cd receive_jira_webhook &&
-          GOOS=linux GOARCH=amd64 go build -buildvcs=false -o main &&
+          GOOS=linux GOARCH=amd64 go build -buildvcs=false -o main main.go &&
           zip /usr/src/polite_inquiry_converter/receive_jira_webhook/function.zip main
         '
 
