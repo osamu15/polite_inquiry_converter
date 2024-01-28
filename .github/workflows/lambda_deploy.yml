@@ -20,7 +20,10 @@ jobs:
           yum install -y golang zip &&
           cd receive_jira_webhook &&
           GOOS=linux GOARCH=amd64 go build -buildvcs=false -o main main.go &&
-          zip /usr/src/polite_inquiry_converter/receive_jira_webhook/function.zip main
+          zip /usr/src/polite_inquiry_converter/receive_jira_webhook/function.zip main &&
+          cd ../convert_inquiry_by_chatgpt &&
+          GOOS=linux GOARCH=amd64 go build -buildvcs=false -o main main.go &&
+          zip /usr/src/polite_inquiry_converter/convert_inquiry_by_chatgpt/function.zip main
         '
 
     - name: Configure AWS Credentials
@@ -31,4 +34,6 @@ jobs:
         aws-region: ${{ secrets.AWS_REGION }}
 
     - name: Deploy to Lambda functions
-      run: aws lambda update-function-code --function-name receiveJiraWebhook --zip-file fileb://receive_jira_webhook/function.zip
+      run: |
+        aws lambda update-function-code --function-name receiveJiraWebhook --zip-file fileb://receive_jira_webhook/function.zip
+        aws lambda update-function-code --function-name convertInquiryByChatGPT --zip-file fileb://convert_inquiry_by_chatgpt/function.zip
