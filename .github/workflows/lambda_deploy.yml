@@ -13,25 +13,26 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
     
-    - name: Test Lmbda function
+    - name: Setup Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.20
+    
+    - name: Test Lambda function
       run: |
         cd receive_jira_webhook
         go test
         cd ../convert_inquiry_by_chatgpt
         go test
 
-    - name: Build Lambda function using Docker
+    - name: Build Lambda function
       run: |
-        docker run --rm -v "$PWD":/usr/src/polite_inquiry_converter -w /usr/src/polite_inquiry_converter amazonlinux:2 sh -c '
-          yum update -y &&
-          yum install -y golang zip &&
-          cd receive_jira_webhook &&
-          GOOS=linux GOARCH=amd64 go build -buildvcs=false -o main main.go &&
-          zip /usr/src/polite_inquiry_converter/receive_jira_webhook/function.zip main &&
-          cd ../convert_inquiry_by_chatgpt &&
-          GOOS=linux GOARCH=amd64 go build -buildvcs=false -o main main.go &&
-          zip /usr/src/polite_inquiry_converter/convert_inquiry_by_chatgpt/function.zip main
-        '
+        cd receive_jira_webhook
+        GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o main main.go
+        zip function.zip main
+        cd ../convert_inquiry_by_chatgpt
+        GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o main main.go
+        zip function.zip main
 
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v1
