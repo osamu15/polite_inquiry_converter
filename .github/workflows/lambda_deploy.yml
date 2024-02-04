@@ -12,6 +12,13 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
+    
+    - name: Test Lmbda function
+      run: |
+        cd receive_jira_webhook
+        go test
+        cd ../convert_inquiry_by_chatgpt
+        go test
 
     - name: Build Lambda function using Docker
       run: |
