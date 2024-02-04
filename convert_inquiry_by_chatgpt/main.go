@@ -11,6 +11,10 @@ import (
 	"os"
 )
 
+type ConvertInquiryByChatGPT interface {
+	ConvertTextByChatGPT(prompt, inquiryText string) (string, error)
+}
+
 type Request struct {
 	Body       string `json:"body"`
 	StatusCode int    `json:"statuscode"`
@@ -42,7 +46,7 @@ type Choice struct {
 func HandleRequest(ctx context.Context, request Request) (Response, error) {
 	prompt := "## 内容を変えずに文字を丁寧な表現に変更してください。"
 	inquiryText := request.Body
-	convertedText, err := convertTextByChatGPT(prompt, inquiryText)
+	convertedText, err := ConvertTextByChatGPT(prompt, inquiryText)
 	if err != nil {
 		return Response{Body: "Unable to Convert Text by ChatGPT", StatusCode: 500}, err
 	}
@@ -50,7 +54,7 @@ func HandleRequest(ctx context.Context, request Request) (Response, error) {
 	return Response{Body: convertedText, StatusCode: 200}, nil
 }
 
-func convertTextByChatGPT(prompt, inquiryText string) (string, error) {
+func ConvertTextByChatGPT(prompt, inquiryText string) (string, error) {
 	requestData := OpenAIRequest{
 		Model: "gpt-3.5-turbo",
 		Messages: []Message{
