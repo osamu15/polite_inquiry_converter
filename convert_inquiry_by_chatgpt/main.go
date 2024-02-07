@@ -86,7 +86,7 @@ func ConvertTextByChatGPT(prompt, inquiryText string) (string, error) {
 		return "", fmt.Errorf("decoding response failed: %w", err)
 	}
 
-	if len(result.Choices) == 0 || result.Choices[0].Message.Content == "" {
+	if len(result.Choices) == 0 {
 		return "", errors.New("no valid response found in the choices")
 	}
 
