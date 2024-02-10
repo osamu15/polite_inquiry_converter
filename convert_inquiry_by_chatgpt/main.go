@@ -6,9 +6,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/aws/aws-lambda-go/lambda"
 	"net/http"
 	"os"
+
+	"github.com/aws/aws-lambda-go/lambda"
 )
 
 type ConvertInquiryByChatGPT interface {
@@ -35,16 +36,8 @@ type Message struct {
 	Content string `json:"content"`
 }
 
-type OpenAIResponse struct {
-	Choices []Choice `json:"choices"`
-}
-
-type Choice struct {
-	Message Message `json:"message"`
-}
-
 func HandleRequest(ctx context.Context, request Request) (Response, error) {
-	prompt := "## 内容を変えずに文字を丁寧な表現に変更してください。"
+	prompt := "## 内容を変えずに文章を丁寧な表現に変更してください。"
 	inquiryText := request.Body
 	convertedText, err := ConvertTextByChatGPT(prompt, inquiryText)
 	if err != nil {
@@ -81,16 +74,18 @@ func ConvertTextByChatGPT(prompt, inquiryText string) (string, error) {
 	}
 	defer resp.Body.Close()
 
-	var result OpenAIResponse
+	var result map[string]interface{}
 	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
 		return "", fmt.Errorf("decoding response failed: %w", err)
 	}
 
-	if len(result.Choices) == 0 {
+	choices := result["choices"].([]interface{})
+	if len(choices) == 0 {
 		return "", errors.New("no valid response found in the choices")
 	}
+	convertedText := choices[0].(map[string]interface{})["message"].(map[string]interface{})["content"].(string)
 
-	return result.Choices[0].Message.Content, nil
+	return convertedText, nil
 }
 
 func main() {
