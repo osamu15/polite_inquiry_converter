@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 
@@ -35,6 +34,28 @@ type OpenAIRequest struct {
 type Message struct {
 	Role    string `json:"role"`
 	Content string `json:"content"`
+}
+
+type OpenAIResponse struct {
+	Choices []Choice `json:"choices"`
+	Created int64    `json:"created"`
+	ID      string   `json:"id"`
+	Model   string   `json:"model"`
+	Object  string   `json:"object"`
+	Usage   Usage    `json:"usage"`
+}
+
+type Choice struct {
+	FinishReason string      `json:"finish_reason"`
+	Index        int         `json:"index"`
+	Message      Message     `json:"message"`
+	LogProbs     interface{} `json:"logprobs"`
+}
+
+type Usage struct {
+	CompletionTokens int `json:"completion_tokens"`
+	PromptTokens     int `json:"prompt_tokens"`
+	TotalTokens      int `json:"total_tokens"`
 }
 
 func HandleRequest(ctx context.Context, request Request) (Response, error) {
@@ -75,20 +96,16 @@ func ConvertTextByChatGPT(prompt, inquiryText string) (string, error) {
 	}
 	defer resp.Body.Close()
 
-	log.Print(resp.Body)
-	var result map[string]interface{}
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+	var response OpenAIResponse
+	if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
 		return "", fmt.Errorf("decoding response failed: %w", err)
 	}
-	log.Print(result)
 
-	choices := result["choices"].([]interface{})
-	if len(choices) == 0 {
+	if len(response.Choices) == 0 {
 		return "", errors.New("no valid response found in the choices")
 	}
-	convertedText := choices[0].(map[string]interface{})["message"].(map[string]interface{})["content"].(string)
 
-	return convertedText, nil
+	return response.Choices[0].Message.Content, nil
 }
 
 func main() {
