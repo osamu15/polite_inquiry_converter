@@ -37,28 +37,6 @@ type Message struct {
 	Content string `json:"content"`
 }
 
-type OpenAIResponse struct {
-	Choices []Choice `json:"choices"`
-	Created int64    `json:"created"`
-	ID      string   `json:"id"`
-	Model   string   `json:"model"`
-	Object  string   `json:"object"`
-	Usage   Usage    `json:"usage"`
-}
-
-type Choice struct {
-	FinishReason string      `json:"finish_reason"`
-	Index        int         `json:"index"`
-	Message      Message     `json:"message"`
-	LogProbs     interface{} `json:"logprobs"`
-}
-
-type Usage struct {
-	CompletionTokens int `json:"completion_tokens"`
-	PromptTokens     int `json:"prompt_tokens"`
-	TotalTokens      int `json:"total_tokens"`
-}
-
 func HandleRequest(ctx context.Context, request Request) (Response, error) {
 	prompt := "## 内容を変えずに文章を丁寧な表現に変更してください。"
 	inquiryText := request.Body
@@ -97,17 +75,33 @@ func ConvertTextByChatGPT(prompt, inquiryText string) (string, error) {
 	}
 	defer resp.Body.Close()
 
-	var response OpenAIResponse
+	var response map[string]interface{}
 	if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
 		return "", fmt.Errorf("decoding response failed: %w", err)
 	}
 	log.Println(response)
 
-	if len(response.Choices) == 0 {
+	choices, ok := response["choices"].([]interface{})
+	if !ok {
 		return "", errors.New("no valid response found in the choices")
 	}
 
-	return response.Choices[0].Message.Content, nil
+	choice, ok := choices[0].(map[string]interface{})
+	if !ok {
+		return "", errors.New("no valid response found in the choice")
+	}
+
+	message, ok := choice["message"].(map[string]interface{})
+	if !ok {
+		return "", errors.New("no valid response found in the message")
+	}
+
+	content, ok := message["content"].(string)
+	if !ok {
+		return "", errors.New("no valid response found in the content")
+	}
+
+	return content, nil
 }
 
 func main() {
