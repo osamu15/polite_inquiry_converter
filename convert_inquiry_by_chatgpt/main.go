@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 
@@ -100,6 +101,7 @@ func ConvertTextByChatGPT(prompt, inquiryText string) (string, error) {
 	if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
 		return "", fmt.Errorf("decoding response failed: %w", err)
 	}
+	log.Println(response)
 
 	if len(response.Choices) == 0 {
 		return "", errors.New("no valid response found in the choices")
