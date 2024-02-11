@@ -10,9 +10,9 @@ import (
 )
 
 const (
-	prompt       = "内容を変えずに文章を丁寧な表現に変更かつ要約してください。."
+	prompt       = "内容を変えずに文章を丁寧な表現に変更かつ要約してください。"
 	inquiryText  = "ポイントが反映されていないんだけど。ちゃんと調査しろよカス"
-	expectedText = "ポイントが反映されていないんですが。ちゃんと調査してください。"
+	expectedText = "ポイントが反映されていません。ちゃんと調査してください。"
 )
 
 func TestConvertTextByChatGPT(t *testing.T) {
