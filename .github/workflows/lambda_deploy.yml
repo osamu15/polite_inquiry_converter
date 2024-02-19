@@ -28,11 +28,14 @@ jobs:
     - name: Build Lambda function
       run: |
         cd receive_jira_webhook
-        GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o main main.go
-        zip function.zip main
+        GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o bootstrap main.go
+        zip function.zip bootstrap
         cd ../convert_inquiry_by_chatgpt
-        GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o main main.go
-        zip function.zip main
+        GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o bootstrap main.go
+        zip function.zip bootstrap
+        cd ../create_jira_issue
+        GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o bootstrap main.go
+        zip function.zip bootstrap
 
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v1
@@ -45,3 +48,4 @@ jobs:
       run: |
         aws lambda update-function-code --function-name receiveJiraWebhook --zip-file fileb://receive_jira_webhook/function.zip
         aws lambda update-function-code --function-name convertInquiryByChatGPT --zip-file fileb://convert_inquiry_by_chatgpt/function.zip
+        aws lambda update-function-code --function-name createJiraIssue --zip-file fileb://create_jira_issue/function.zip
