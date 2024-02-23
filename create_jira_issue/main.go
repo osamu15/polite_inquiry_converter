@@ -43,7 +43,7 @@ type Response struct {
 func HandleRequest(ctx context.Context, request Request) (Response, error) {
 	jiraIssue := JiraIssue{
 		Fields: Field{
-			Project:     Project{Key: "KOFL"},
+			Project:     Project{Key: "JPWN"},
 			Summary:     "お問い合わせ内容の要約",
 			Description: request.Body,
 			Issuetype:   Issuetype{Name: "Task"},
