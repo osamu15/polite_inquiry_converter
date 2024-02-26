@@ -3,6 +3,8 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"log"
+
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 )
@@ -30,6 +32,7 @@ func HandleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 	if err != nil {
 		return Response{Body: "Unable to parse JSON from request", StatusCode: 400}, err
 	}
+	log.Println(jiraReq)
 
 	description := jiraReq.Issue.Fields.Description
 	if description == "" {
