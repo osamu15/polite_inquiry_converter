@@ -28,11 +28,11 @@ type Response struct {
 
 func HandleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (Response, error) {
 	var jiraReq JiraWebhookRequest
+	log.Println(request.Body)
 	err := json.Unmarshal([]byte(request.Body), &jiraReq)
 	if err != nil {
 		return Response{Body: "Unable to parse JSON from request", StatusCode: 400}, err
 	}
-	log.Println(jiraReq)
 
 	description := jiraReq.Issue.Fields.Description
 	if description == "" {
