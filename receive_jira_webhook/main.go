@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"encoding/json"
 	"log"
 
@@ -26,7 +25,7 @@ type Response struct {
 	StatusCode int    `json:"statuscode"`
 }
 
-func HandleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (Response, error) {
+func HandleRequest(request events.APIGatewayProxyRequest) (Response, error) {
 	var jiraReq JiraWebhookRequest
 	log.Println(request.Body)
 	err := json.Unmarshal([]byte(request.Body), &jiraReq)

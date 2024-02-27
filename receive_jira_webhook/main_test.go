@@ -1,14 +1,12 @@
 package main
 
 import (
-	"context"
 	"testing"
 	"github.com/aws/aws-lambda-go/events"
 )
 
 func TestHandleRequest(t *testing.T) {
 	type args struct {
-		ctx     context.Context
 		request events.APIGatewayProxyRequest
 	}
 	tests := []struct {
@@ -21,7 +19,6 @@ func TestHandleRequest(t *testing.T) {
 		{
 			name: "Valid Request",
 			args: args{
-				ctx: context.Background(),
 				request: events.APIGatewayProxyRequest{
 					Body: `{"issue": {"fields": {"description": "Test description"}}}`,
 				},
@@ -33,7 +30,6 @@ func TestHandleRequest(t *testing.T) {
         {
             name: "Invalid JSON",
 			args: args{
-				ctx: context.Background(),
 				request: events.APIGatewayProxyRequest{
 					Body: `{invalid_json}`,
 				},
@@ -45,7 +41,6 @@ func TestHandleRequest(t *testing.T) {
 		{
 			name: "Empty Description in JSON",
 			args: args{
-				ctx: context.Background(),
 				request: events.APIGatewayProxyRequest{
 					Body: `{"issue": {"fields": { "description": "" }}}`,
 				},
@@ -57,7 +52,7 @@ func TestHandleRequest(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := HandleRequest(tt.args.ctx, tt.args.request)
+			got, err := HandleRequest(tt.args.request)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("HandleRequest() error = %v, wantErr %v", err, tt.wantErr)
 				return
