@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"log"
 
@@ -25,7 +26,7 @@ type Response struct {
 	StatusCode int    `json:"statuscode"`
 }
 
-func HandleRequest(request events.APIGatewayProxyRequest) (Response, error) {
+func HandleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (Response, error) {
 	var jiraReq JiraWebhookRequest
 	log.Println(request.Body)
 	err := json.Unmarshal([]byte(request.Body), &jiraReq)
@@ -37,6 +38,7 @@ func HandleRequest(request events.APIGatewayProxyRequest) (Response, error) {
 	if description == "" {
 		return Response{Body: "Empty Description in JSON", StatusCode: 400}, nil
 	}
+	log.Println(description)
 
 	return Response{Body: description, StatusCode: 200}, nil
 }
