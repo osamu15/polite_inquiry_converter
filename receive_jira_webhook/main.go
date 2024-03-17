@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"log"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -27,6 +28,7 @@ type Response struct {
 
 func HandleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (Response, error) {
 	var jiraReq JiraWebhookRequest
+	log.Println(request.Body)
 	err := json.Unmarshal([]byte(request.Body), &jiraReq)
 	if err != nil {
 		return Response{Body: "Unable to parse JSON from request", StatusCode: 400}, err
