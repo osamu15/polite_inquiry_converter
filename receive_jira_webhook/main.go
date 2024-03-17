@@ -38,12 +38,12 @@ func HandleRequest(ctx context.Context, event json.RawMessage) (Response, error)
 	}
 
 	log.Println(event)
-	if inputData == "" {
+	description := inputData.(map[string]interface{})["parameters"].(map[string]interface{})["Payload"].(map[string]interface{})["issue"].(map[string]interface{})["description"].(string)
+	if description == "" {
 		return Response{Body: "Empty Description in JSON", StatusCode: 400}, nil
 	}
-	responseData, err := json.Marshal(inputData)
 
-	return Response{Body: string(responseData), StatusCode: 200}, nil
+	return Response{Body: description, StatusCode: 200}, nil
 }
 
 func main() {

@@ -2,13 +2,14 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"testing"
 )
 
 func TestHandleRequest(t *testing.T) {
 	type args struct {
 		context context.Context
-		event   StepFunctionInput
+		event   json.RawMessage
 	}
 	tests := []struct {
 		name             string
@@ -21,15 +22,15 @@ func TestHandleRequest(t *testing.T) {
 			name: "Valid Request",
 			args: args{
 				context: context.Background(),
-				event: StepFunctionInput{
-					Parameters: Parameters{
-						Payload: Payload{
-							Issue: Issue{
-								Description: "Test description",
-							},
-						},
-					},
-				},
+				event: json.RawMessage(`{
+					"parameters": {
+						"Payload": {
+							"issue": {
+								"description": "Test description"
+							}
+						}
+					}
+				}`),
 			},
 			wantStatusCode:   200,
 			wantErr:          false,
@@ -39,15 +40,7 @@ func TestHandleRequest(t *testing.T) {
 			name: "Empty Description in JSON",
 			args: args{
 				context: context.Background(),
-				event: StepFunctionInput{
-					Parameters: Parameters{
-						Payload: Payload{
-							Issue: Issue{
-								Description: "",
-							},
-						},
-					},
-				},
+				event:   json.RawMessage(`{"parameters": {"Payload": {"issue": {"description": ""}}}}`),
 			},
 			wantStatusCode:   400,
 			wantErr:          false,
