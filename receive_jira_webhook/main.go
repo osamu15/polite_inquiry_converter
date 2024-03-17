@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"log"
 
 	"github.com/aws/aws-lambda-go/lambda"
 )
@@ -29,6 +30,7 @@ type Response struct {
 
 func HandleRequest(ctx context.Context, event StepFunctionInput) (Response, error) {
 	description := event.Parameters.Payload.Issue.Description
+	log.Println(event)
 	if description == "" {
 		return Response{Body: "Empty Description in JSON", StatusCode: 400}, nil
 	}
