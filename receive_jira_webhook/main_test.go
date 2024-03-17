@@ -8,7 +8,7 @@ import (
 func TestHandleRequest(t *testing.T) {
 	type args struct {
 		context context.Context
-		event   StepFunctionInput
+		event   Payload
 	}
 	tests := []struct {
 		name             string
@@ -21,7 +21,7 @@ func TestHandleRequest(t *testing.T) {
 			name: "Valid Request",
 			args: args{
 				context: context.Background(),
-				event:  StepFunctionInput{Payload: Payload{Issue: Issue{Description: "Test description"}}},
+				event:   Payload{Issue: Issue{Description: "Test description"}},
 			},
 			wantStatusCode:   200,
 			wantErr:          false,
@@ -31,7 +31,7 @@ func TestHandleRequest(t *testing.T) {
 			name: "Empty Description in JSON",
 			args: args{
 				context: context.Background(),
-				event:   StepFunctionInput{Payload: Payload{Issue: Issue{Description: ""}}},
+				event:   Payload{Issue: Issue{Description: ""}},
 			},
 			wantStatusCode:   400,
 			wantErr:          false,

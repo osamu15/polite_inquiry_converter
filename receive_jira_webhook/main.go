@@ -7,10 +7,6 @@ import (
 	"github.com/aws/aws-lambda-go/lambda"
 )
 
-type StepFunctionInput struct {
-	Payload Payload `json:"Payload"`
-}
-
 type Payload struct {
 	Issue Issue `json:"issue"`
 }
@@ -24,9 +20,9 @@ type Response struct {
 	StatusCode int    `json:"statuscode"`
 }
 
-func HandleRequest(ctx context.Context, event StepFunctionInput) (Response, error) {
+func HandleRequest(ctx context.Context, event Payload) (Response, error) {
 	log.Println(event)
-	description := event.Payload.Issue.Description
+	description := event.Issue.Description
 	if description == "" {
 		return Response{Body: "Empty Description in JSON", StatusCode: 400}, nil
 	}
