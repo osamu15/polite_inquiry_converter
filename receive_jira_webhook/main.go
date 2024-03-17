@@ -2,22 +2,23 @@ package main
 
 import (
 	"context"
-	"encoding/json"
-	"log"
 
-	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 )
 
-type JiraWebhookRequest struct {
+type StepFunctionInput struct {
+	Parameters Parameters `json:"parameters"`
+}
+
+type Parameters struct {
+	Payload Payload `json:"Payload"`
+}
+
+type Payload struct {
 	Issue Issue `json:"issue"`
 }
 
 type Issue struct {
-	Fields Fields `json:"fields"`
-}
-
-type Fields struct {
 	Description string `json:"description"`
 }
 
@@ -26,15 +27,8 @@ type Response struct {
 	StatusCode int    `json:"statuscode"`
 }
 
-func HandleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (Response, error) {
-	var jiraReq JiraWebhookRequest
-	log.Println(request.Body)
-	err := json.Unmarshal([]byte(request.Body), &jiraReq)
-	if err != nil {
-		return Response{Body: "Unable to parse JSON from request", StatusCode: 400}, err
-	}
-
-	description := jiraReq.Issue.Fields.Description
+func HandleRequest(ctx context.Context, event StepFunctionInput) (Response, error) {
+	description := event.Parameters.Payload.Issue.Description
 	if description == "" {
 		return Response{Body: "Empty Description in JSON", StatusCode: 400}, nil
 	}

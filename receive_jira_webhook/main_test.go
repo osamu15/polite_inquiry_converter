@@ -3,62 +3,60 @@ package main
 import (
 	"context"
 	"testing"
-
-	"github.com/aws/aws-lambda-go/events"
 )
 
 func TestHandleRequest(t *testing.T) {
 	type args struct {
 		context context.Context
-		request events.APIGatewayProxyRequest
+		event   StepFunctionInput
 	}
 	tests := []struct {
-		name            string
-		args            args
-		wantStatusCode  int
-		wantErr         bool
+		name             string
+		args             args
+		wantStatusCode   int
+		wantErr          bool
 		wantResponseBody string
 	}{
 		{
 			name: "Valid Request",
 			args: args{
 				context: context.Background(),
-				request: events.APIGatewayProxyRequest{
-					Body: `{"issue": {"fields": {"description": "Test description"}}}`,
+				event: StepFunctionInput{
+					Parameters: Parameters{
+						Payload: Payload{
+							Issue: Issue{
+								Description: "Test description",
+							},
+						},
+					},
 				},
 			},
-			wantStatusCode:  200,
-			wantErr:         false,
+			wantStatusCode:   200,
+			wantErr:          false,
 			wantResponseBody: "Test description",
 		},
-        {
-            name: "Invalid JSON",
-			args: args{
-				context: context.Background(),
-				request: events.APIGatewayProxyRequest{
-					Body: `{invalid_json}`,
-				},
-			},
-			wantStatusCode: 400,
-			wantErr: true,
-			wantResponseBody: "Unable to parse JSON from request",
-        },
 		{
 			name: "Empty Description in JSON",
 			args: args{
 				context: context.Background(),
-				request: events.APIGatewayProxyRequest{
-					Body: `{"issue": {"fields": { "description": "" }}}`,
+				event: StepFunctionInput{
+					Parameters: Parameters{
+						Payload: Payload{
+							Issue: Issue{
+								Description: "",
+							},
+						},
+					},
 				},
 			},
-			wantStatusCode: 400,
-			wantErr: false,
+			wantStatusCode:   400,
+			wantErr:          false,
 			wantResponseBody: "Empty Description in JSON",
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := HandleRequest(tt.args.context, tt.args.request)
+			got, err := HandleRequest(tt.args.context, tt.args.event)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("HandleRequest() error = %v, wantErr %v", err, tt.wantErr)
 				return
