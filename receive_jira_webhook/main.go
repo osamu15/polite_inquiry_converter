@@ -12,6 +12,10 @@ type Payload struct {
 }
 
 type Issue struct {
+	Fields Fields `json:"fields"`
+}
+
+type Fields struct {
 	Description string `json:"description"`
 }
 
@@ -22,7 +26,7 @@ type Response struct {
 
 func HandleRequest(ctx context.Context, event Payload) (Response, error) {
 	log.Println(event)
-	description := event.Issue.Description
+	description := event.Issue.Fields.Description
 	if description == "" {
 		return Response{Body: "Empty Description in JSON", StatusCode: 400}, nil
 	}
