@@ -2,17 +2,12 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"log"
 
 	"github.com/aws/aws-lambda-go/lambda"
 )
 
 type StepFunctionInput struct {
-	Parameters Parameters `json:"parameters"`
-}
-
-type Parameters struct {
 	Payload Payload `json:"Payload"`
 }
 
@@ -29,16 +24,9 @@ type Response struct {
 	StatusCode int    `json:"statuscode"`
 }
 
-func HandleRequest(ctx context.Context, event json.RawMessage) (Response, error) {
-	var inputData interface{}
-	err := json.Unmarshal(event, &inputData)
-	if err != nil {
-		log.Println("Error unmarshalling event:", err)
-		return Response{Body: "Error parsing input JSON", StatusCode: 400}, nil
-	}
-
+func HandleRequest(ctx context.Context, event StepFunctionInput) (Response, error) {
 	log.Println(event)
-	description := inputData.(map[string]interface{})["parameters"].(map[string]interface{})["Payload"].(map[string]interface{})["issue"].(map[string]interface{})["description"].(string)
+	description := event.Payload.Issue.Description
 	if description == "" {
 		return Response{Body: "Empty Description in JSON", StatusCode: 400}, nil
 	}
