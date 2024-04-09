@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"log"
 
 	"github.com/aws/aws-lambda-go/lambda"
 )
@@ -25,10 +24,9 @@ type Response struct {
 }
 
 func HandleRequest(ctx context.Context, event Payload) (Response, error) {
-	log.Println(event)
 	description := event.Issue.Fields.Description
 	if description == "" {
-		return Response{Body: "Empty Description in JSON", StatusCode: 400}, nil
+		return Response{Body: "Empty Description in JSON", StatusCode: 404}, nil
 	}
 
 	return Response{Body: description, StatusCode: 200}, nil

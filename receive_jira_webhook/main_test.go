@@ -33,7 +33,7 @@ func TestHandleRequest(t *testing.T) {
 				context: context.Background(),
 				event:   Payload{Issue: Issue{Fields: Fields{Description: ""}}},
 			},
-			wantStatusCode:   400,
+			wantStatusCode:   404,
 			wantErr:          false,
 			wantResponseBody: "Empty Description in JSON",
 		},

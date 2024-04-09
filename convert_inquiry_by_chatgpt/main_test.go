@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"testing"
 
@@ -14,6 +15,42 @@ const (
 	inquiryText  = "ポイントが反映されていないんだけど。ちゃんと調査しろよカス"
 	expectedText = "ポイントが反映されていません。ちゃんと調査してください。"
 )
+
+func TestHandleRequest(t *testing.T) {
+	t.Run("Convert Success", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		mockConvertInquiryByChatGPT := mock_main.NewMockConvertInquiryByChatGPT(ctrl)
+		mockConvertInquiryByChatGPT.EXPECT().ConvertTextByChatGPT(prompt, inquiryText).Return(expectedText, nil)
+
+		request := Request{Body: inquiryText}
+		expectedResponse := Response{Body: expectedText, StatusCode: 200}
+
+		response, err := HandleRequest(context.Background(), request, mockConvertInquiryByChatGPT)
+
+		assert.NoError(t, err)
+		assert.Equal(t, expectedResponse, response)
+	})
+
+	t.Run("Unable to Convert Text by ChatGPT", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		mockConvertInquiryByChatGPT := mock_main.NewMockConvertInquiryByChatGPT(ctrl)
+		expectedErr := errors.New("unable to convert text by ChatGPT")
+		mockConvertInquiryByChatGPT.EXPECT().ConvertTextByChatGPT(prompt, inquiryText).Return("", expectedErr)
+
+		request := Request{Body: inquiryText}
+		expectedResponse := Response{Body: "Unable to Convert Text by ChatGPT", StatusCode: 404}
+
+		response, err := HandleRequest(context.Background(), request, mockConvertInquiryByChatGPT)
+
+		assert.Error(t, err)
+		assert.Equal(t, expectedResponse, response)
+		assert.Equal(t, expectedErr, err)
+	})
+}
 
 func TestConvertTextByChatGPT(t *testing.T) {
 	t.Run("Convert Success", func(t *testing.T) {

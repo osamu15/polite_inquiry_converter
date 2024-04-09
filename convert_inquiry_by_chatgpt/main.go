@@ -44,12 +44,12 @@ type Choice struct {
 	Message Message `json:"message"`
 }
 
-func HandleRequest(ctx context.Context, request Request) (Response, error) {
+func HandleRequest(ctx context.Context, request Request, conv ConvertInquiryByChatGPT) (Response, error) {
 	prompt := "内容を変えずに文章を丁寧な表現に変更かつ要約してください。"
 	inquiryText := request.Body
-	convertedText, err := ConvertTextByChatGPT(prompt, inquiryText)
+	convertedText, err := conv.ConvertTextByChatGPT(prompt, inquiryText)
 	if err != nil {
-		return Response{Body: "Unable to Convert Text by ChatGPT", StatusCode: 500}, err
+		return Response{Body: "Unable to Convert Text by ChatGPT", StatusCode: 404}, err
 	}
 
 	return Response{Body: convertedText, StatusCode: 200}, nil
